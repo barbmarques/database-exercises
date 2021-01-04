@@ -66,19 +66,20 @@ GROUP BY first_name, gender;
 
 
 
-SELECT DISTINCT LOWER(CONCAT(SUBSTR(first_name,1,1),substr(last_name,1,4),"_",substr(birth_date,6,2),substr(birth_date,3,2))) AS username, first_name, last_name, birth_date, COUNT(*)
+SELECT LOWER(
+					CONCAT(
+					 SUBSTR(first_name,1,1),
+					 substr(last_name,1,4),
+					 "_",
+					 substr(birth_date,6,2),
+					 substr(birth_date,3,2)
+					 )) 
+AS "username", COUNT(*) as number_of_duplicates
 FROM employees
-GROUP BY username, first_name, last_name, birth_date
-ORDER BY count(*) desc;  #There are 300,018 user names
+GROUP BY username
+having number_of_duplicates >1;  
 
-#BONUS:  THere are 6 duplicate user names
-
--- tcrom_0563	Tonny		Cromarty	1963-05-07	2
--- sghal_1263	Sarita		Ghalwash	1963-12-08	2
--- sgide_0763	Shim		Gide		1963-07-10	2
--- pgran_1156	Pintsang	Granlund	1956-11-25	2
--- pacto_0558	Pragnesh	Acton		1958-05-12	2
--- hnego_0763	Holgard		Negoita		1963-07-19	2
-
+#BONUS:  
+#There are 300,018 user names
 
 
