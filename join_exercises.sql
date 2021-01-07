@@ -127,17 +127,45 @@ LIMIT 1;
 #10 BONUS
 #Find the names of all current employees, their department name, and their current manager's name 
 
-SELECT CONCAT(first_name," ",last_name) AS "Employee Name"
-			FROM dept_emp JOIN employees USING(emp_no)
-			JOIN departments ON departments.dept_no = dept_emp.dept_no
-			WHERE to_date>curdate()
-			,
-			(dept_name AS "Department Name"
-			FROM dept_emp JOIN departments USING(dept_no)	
-			),
-			
+SELECT *                   
+FROM (Select concat(e.first_name," ",e.last_name) AS "Employee Name", dept_name AS "Department Name"
+From employees e JOIN dept_emp USING(emp_no)
+JOIN departments USING(dept_no)
+WHERE dept_emp.to_date > curdate()
+GROUP BY "Employee Name", "Department Name") T1;
+
+JOIN (Select concat(m.first_name," ",m.last_name) AS "Manager Name" 
+From dept_manager
+JOIN employees m USING(emp_no)
+WHERE dept_manager.to_date > curdate()
+GROUP BY emp_no) T2;
+
+JOIN (select dept_name AS "Department Name"
+from departments
+JOIN dept_emp USING(dept_no)
+WHERE dept_emp.to_date > curdate()
+WHERE dept_manager.to_date > curdate()
+GROUP BY emp_no);
+
+
+SELECT first_name, last_name
+FROM employees
+WHERE first_name =
+
+
+FROM
+    employees e
+INNER JOIN employees m ON 
+    m.employeeNumber = e.reportsTo
 			
 # 11 BONUS
 # Who is the highest paid employee within each department?
 			
-			
+USE employees;	
+SELECT first_name, last_name, dept_name, salary
+FROM salaries
+JOIN employees USING(emp_no)
+JOIN dept_emp USING(emp_no)
+JOIN departments USING(dept_no);
+
+
