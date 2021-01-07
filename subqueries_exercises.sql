@@ -4,10 +4,12 @@ USE employees;
 
 SELECT CONCAT(first_name," ",last_name), hire_date
 FROM employees
+JOIN dept_emp ON employees.emp_no = dept_emp.emp_no	
 WHERE hire_date = (
 		SELECT hire_date
 		FROM employees
-		WHERE emp_no = 101010);    #69 employees hired 1990-10-22
+		WHERE emp_no = 101010)
+AND emp_no.to_date>curdate();    #69 employees hired 1990-10-22
 		
 		
 #2 Find all the titles ever held by all current employees with the first name Aamod.
@@ -20,7 +22,7 @@ WHERE first_name="Aamod"
 AND dept_emp.to_date>curdate()
 GROUP BY title;    
 
-   -- 6 different titles. (Assistant Engineer, Engineer, Senior Engineer, Senior Staff, Staff, Technique Leader
+   -- 6 different titles. (Assistant Engineer, Engineer, Senior Engineer, Senior Staff, Staff, Technique Leader)
 
 SELECT title, first_name
 FROM employees 
@@ -46,7 +48,7 @@ WHERE to_date IN (
 OR to_date IN (
 	SELECT to_date from dept_manager WHERE to_date<curdate());
 
-	--  91,479 employees
+	--  91,479 employees. ----- should be 59,900
 
 
 #4 Find all the current department managers that are female. List their names in a comment in your code.
@@ -81,7 +83,7 @@ ORDER BY SALARY ASC;
   -- 154,543
 
 
-#6 How many current salaries are within 1 standard deviation of the current highest salary? (Hint: you can use a built in function to calculate the standard deviation.) What percentage of all salaries is this?
+#6 How many current salaries are within 1 standard deviation of the current highest salary? (Hint: you can use a built in function to calculate the standard deviation.) 
 
  -- highest current salary is 158,220
 
@@ -92,32 +94,63 @@ where to_date>curdate();
 
 SELECT COUNT(salary)
 from salaries
-WHERE salary > (SELECT max(salary)-STDDEV(salary) FROM salaries WHERE to_date>curdate())
-AND to_date>curdate();
+WHERE salary > (
+			SELECT max(salary)-STDDEV(salary) 
+			FROM salaries 
+			WHERE to_date>curdate())
+AND to_date>curdate();  -- 83
 
-
-
-SELECT COUNT(SALARY)
-FROM salaries
-WHERE to_date>curdate();
-
+-- What percentage of all salaries is this?
+USE employees;
 
 SELECT
 (SELECT COUNT(salary)
 from salaries
-WHERE salary > (SELECT max(salary)-STDDEV(salary) FROM salaries WHERE to_date>curdate())
-AND to_date>curdate()
+WHERE salary > (
+	SELECT max(salary)-
+			STDDEV(salary) 
+			FROM salaries 
+			WHERE to_date>curdate())
+AND to_date>curdate())
 /
-SELECT COUNT(salary)
+(SELECT COUNT(salary)
 FROM salaries
-WHERE to_date>curdate()
-*100);
+WHERE to_date>curdate())
+*100;     
+   
+     -- 0.346%
 
 
-#BONUS
+# BONUS
 
-#Find all the department names that currently have female managers.
+# Find all the department names that currently have female managers.
 
-Find the first and last name of the employee with the highest salary.
+SELECT dept_name
+FROM departments
+WHERE dept_no IN(
+			SELECT dept_no 
+			FROM dept_manager 
+			WHERE dept_manager.to_date>curdate() 
+			AND emp_no IN(
+				SELECT emp_no 
+				FROM employees 
+				WHERE gender = "F"))
+ORDER BY dept_name;
 
-Find the department name that the employee with the highest salary works in.
+
+   -- Development
+   -- Finance
+   -- Human Resources
+   -- Research 
+   
+   
+# Find the first and last name of the employee with the highest salary.
+
+should be: Tokuyasu Pesch 158220
+
+
+
+
+# Find the department name that the employee with the highest salary works in.
+
+should be: sales
